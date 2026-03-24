@@ -1,0 +1,5 @@
+pandas
+faker
+google-cloud-bigquery
+python-dotenv
+dbt-bigquery
