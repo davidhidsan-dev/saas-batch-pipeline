@@ -17,8 +17,6 @@ EVENTS_FILE = DATA_DIR / "events.csv"
 
 # Synthetic data volumes
 USERS_COUNT = 1000
-SUBSCRIPTIONS_MIN = 250
-SUBSCRIPTIONS_MAX = 350
 EVENTS_COUNT = 15000
 
 # Reference values
