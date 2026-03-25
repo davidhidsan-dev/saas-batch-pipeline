@@ -1,3 +1,5 @@
+import pandas as pd
+
 from src.config import (
     EVENTS_COUNT,
     EVENTS_FILE,
@@ -47,6 +49,18 @@ def main() -> None:
         subscriptions_df["status"] == "active", "end_date"
     ].notna().any()
     print(f"Any active subscriptions with end_date: {active_with_end_date}")
+
+    today = pd.Timestamp.today().normalize().date()
+
+    future_subscription_start = (
+        pd.to_datetime(subscriptions_df["start_date"]).dt.date > today
+    ).any()
+    print(f"Any subscription start_date in the future: {future_subscription_start}")
+
+    future_subscription_end = (
+        pd.to_datetime(subscriptions_df["end_date"], errors="coerce").dt.date > today
+    ).any()
+    print(f"Any subscription end_date in the future: {future_subscription_end}")
     print()
 
     print("=== EVENTS ===")

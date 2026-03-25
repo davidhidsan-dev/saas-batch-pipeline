@@ -4,12 +4,12 @@ from datetime import timedelta
 
 import pandas as pd
 
-
 def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
     """Generate synthetic SaaS subscriptions from paid users."""
     max_days_start = 30
     min_days_end = 30
     max_days_end = 180
+    today = pd.Timestamp.today().normalize()
 
     paid_users_df = users_df[users_df["plan_type"].isin(["basic", "pro"])].copy()
 
@@ -45,7 +45,10 @@ def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
         subscription_ids.append(f"sub_{subscription_counter:04d}")
         user_ids.append(user.user_id)
 
-        start_day = user.created_at + timedelta(days=random.randint(0, max_days_start))
+        created_at = pd.Timestamp(user.created_at).normalize()
+
+        start_day_candidate = created_at + timedelta(days=random.randint(0, max_days_start))
+        start_day = min(start_day_candidate, today)
         start_dates.append(start_day.date())
 
         plan_tier = user.plan_type
@@ -70,14 +73,19 @@ def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
             weights=[0.70, 0.20, 0.10],
             k=1,
         )[0]
-        statuses.append(status)
 
         if status == "active":
             end_day = None
         else:
-            end_day = start_day + timedelta(days=random.randint(min_days_end, max_days_end))
-            end_day = end_day.date()
+            end_day_candidate = start_day + timedelta(
+                days=random.randint(min_days_end, max_days_end)
+            )
+            end_day = min(end_day_candidate, today).date()
 
+            if end_day < start_day.date():
+                end_day = start_day.date()
+
+        statuses.append(status)
         end_dates.append(end_day)
 
         subscription_counter += 1
