@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: dim_users
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_subscriptions
+    columns:
+      - name: subscription_id
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_users')
+                field: user_id
+
+  - name: fct_events
+    columns:
+      - name: event_id
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_users')
+                field: user_id
+
+  - name: fct_user_activity
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
