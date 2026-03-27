@@ -1,0 +1,25 @@
+name: "saas_batch_pipeline"
+version: "1.0.0"
+config-version: 2
+
+profile: "saas_batch_pipeline"
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  saas_batch_pipeline:
+    staging:
+      +materialized: view
+      +schema: saas_staging
+    marts:
+      +materialized: table
+      +schema: saas_marts
