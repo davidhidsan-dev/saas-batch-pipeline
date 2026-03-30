@@ -74,7 +74,7 @@ The synthetic source system is composed of three raw tables:
 Main relationships:
 
 - one user can have many events
-- one user can have zero or multiple subscriptions
+- in this first version of the project, one user can have zero or one subscription
 - some events may be related to a subscription
 
 BigQuery layers:

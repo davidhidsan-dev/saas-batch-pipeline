@@ -74,7 +74,7 @@ La fuente sintética se compone de tres tablas raw:
 Relaciones principales:
 
 - un usuario puede tener muchos eventos
-- un usuario puede tener cero o varias suscripciones
+- en esta primera versión del proyecto, un usuario puede tener cero o una suscripción
 - algunos eventos pueden estar relacionados con una suscripción
 
 Capas en BigQuery:
