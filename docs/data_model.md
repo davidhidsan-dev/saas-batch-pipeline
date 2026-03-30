@@ -61,9 +61,9 @@ Columnas propuestas:
 En este proyecto:
 
 - no todos los usuarios tienen suscripción
-- un usuario puede tener cero o varias suscripciones a lo largo del tiempo
-- las suscripciones de un mismo usuario no deben solaparse
+- en esta primera versión del proyecto, un usuario puede tener como máximo una suscripción
 - una suscripción activa normalmente tendrá `end_date` nulo
+- las suscripciones se generan a partir de usuarios con plan de pago
 
 ## ES — Tabla raw `events`
 
@@ -74,7 +74,7 @@ Columnas propuestas:
 - `event_id` (STRING): identificador único del evento
 - `user_id` (STRING): identificador del usuario
 - `event_timestamp` (TIMESTAMP): timestamp del evento
-- `event_type` (STRING): tipo de evento, por ejemplo `signup`, `login`, `feature_use`, `upgrade_click`, `cancel_click`
+- `event_type` (STRING): tipo de evento, por ejemplo `page_view`, `login`, `feature_use`, `upgrade_click`, `cancel_click`
 - `session_id` (STRING): identificador sintético de sesión
 - `device_type` (STRING): tipo de dispositivo, por ejemplo `web`, `mobile`, `tablet`
 - `event_value` (FLOAT): valor numérico opcional para algunos eventos
@@ -98,8 +98,8 @@ El modelo define las siguientes relaciones:
 Esto implica que:
 
 - un usuario puede tener muchos eventos
-- un usuario puede tener cero o varias suscripciones
-- una suscripción puede estar asociada a múltiples eventos
+- en esta primera versión del proyecto, un usuario puede tener cero o una suscripción
+- una suscripción puede estar asociada a uno o varios eventos relacionados
 - algunos eventos no tendrán suscripción asociada
 
 ## ES — Reglas de coherencia de la fuente sintética
@@ -124,7 +124,7 @@ Estas reglas no buscan perfección absoluta, sino consistencia suficiente para u
 El volumen inicial recomendado para el MVP es:
 
 - `users`: 1.000 filas
-- `subscriptions`: 250 a 350 filas
+- `subscriptions`: aproximadamente 180 a 230 filas, dependiendo de la distribución generada de usuarios de pago
 - `events`: 12.000 a 20.000 filas
 
 Este volumen es suficiente para:
@@ -215,9 +215,9 @@ Proposed columns:
 In this project:
 
 - not all users have a subscription
-- one user may have zero or multiple subscriptions over time
-- subscriptions for the same user should not overlap
+- in this first version of the project, one user can have at most one subscription
 - an active subscription will usually have a null `end_date`
+- subscriptions are generated from paid users
 
 ## EN — Raw table `events`
 
@@ -228,7 +228,7 @@ Proposed columns:
 - `event_id` (STRING): unique event identifier
 - `user_id` (STRING): user identifier
 - `event_timestamp` (TIMESTAMP): event timestamp
-- `event_type` (STRING): event type, for example `signup`, `login`, `feature_use`, `upgrade_click`, `cancel_click`
+- `event_type` (STRING): event type, for example `page_view`, `login`, `feature_use`, `upgrade_click`, `cancel_click`
 - `session_id` (STRING): synthetic session identifier
 - `device_type` (STRING): device type, for example `web`, `mobile`, `tablet`
 - `event_value` (FLOAT): optional numeric value for some events
@@ -252,8 +252,8 @@ The model defines the following relationships:
 This implies that:
 
 - one user can have many events
-- one user can have zero or many subscriptions
-- one subscription can be associated with multiple events
+- in this first version of the project, one user can have zero or one subscription
+- one subscription can be associated with one or more related events
 - some events will not have an associated subscription
 
 ## EN — Synthetic source consistency rules
@@ -278,7 +278,7 @@ These rules are not meant to achieve perfect realism, but to provide enough cons
 The recommended initial MVP volume is:
 
 - `users`: 1,000 rows
-- `subscriptions`: 250 to 350 rows
+- `subscriptions`: approximately 180 to 230 rows, depending on the generated distribution of paid users
 - `events`: 12,000 to 20,000 rows
 
 This volume is enough to:
