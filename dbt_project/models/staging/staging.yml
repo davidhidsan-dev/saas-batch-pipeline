@@ -6,13 +6,18 @@ sources:
     schema: saas_raw
     tables:
       - name: users
+        description: Raw users table generated in Python and loaded into BigQuery.
       - name: subscriptions
+        description: Raw subscriptions table generated in Python and loaded into BigQuery.
       - name: events
+        description: Raw events table generated in Python and loaded into BigQuery.
 
 models:
   - name: stg_users
+    description: Cleaned and standardized users model built from the raw users source.
     columns:
       - name: user_id
+        description: Unique user identifier.
         tests:
           - not_null
           - unique

@@ -2,8 +2,10 @@ version: 2
 
 models:
   - name: dim_users
+    description: User dimension model built from the staging users layer.
     columns:
       - name: user_id
+        description: Unique user identifier.
         tests:
           - not_null
           - unique
