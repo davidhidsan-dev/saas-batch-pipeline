@@ -4,11 +4,11 @@ Versión en español de este README: [README.md](README.md)
 
 ## Description
 
-End-to-end data engineering project to generate, load, transform, and validate synthetic SaaS data using Python, BigQuery, and dbt.
+End-to-end data engineering project to generate, load, transform, validate, and orchestrate synthetic SaaS data using Python, BigQuery, dbt, and Apache Airflow.
 
-The pipeline builds a coherent synthetic source system with three tables (`users`, `subscriptions`, `events`), loads that data into BigQuery raw tables, applies layered transformations with dbt, and runs basic data quality tests.
+The pipeline builds a coherent synthetic source system with three tables (`users`, `subscriptions`, `events`), loads that data into BigQuery raw tables, applies layered transformations with dbt, runs basic data quality tests, and can be orchestrated with Airflow as an extension of the initial MVP.
 
-The final result is a reproducible batch pipeline that can be executed end to end with a single local script.
+The final result is a reproducible batch pipeline that can be executed end to end with a single local script and, in a second phase, also through an Airflow DAG.
 
 ## Project goal
 
@@ -19,6 +19,8 @@ Build a reproducible batch pipeline focused on data engineering in order to prac
 - layered modeling with dbt
 - basic data quality validation
 - end-to-end execution with a single local runner
+- basic pipeline orchestration with Airflow
+- basic automated validation with GitHub Actions
 
 ## What this project demonstrates
 
@@ -30,7 +32,10 @@ Build a reproducible batch pipeline focused on data engineering in order to prac
 - definition of basic data quality tests in dbt
 - construction of reusable final models
 - end-to-end execution through a reproducible runner
-- clear separation between ingestion, transformation, and validation
+- local orchestration through Airflow with task-level separation
+- use of XCom to pass small metadata between tasks
+- basic automated validation through GitHub Actions
+- clear separation between ingestion, transformation, validation, and orchestration
 
 ## Stack
 
@@ -38,9 +43,12 @@ Build a reproducible batch pipeline focused on data engineering in order to prac
 - pandas
 - BigQuery
 - dbt
+- Apache Airflow
+- GitHub Actions
 - SQL
 - Git / GitHub
 - VS Code
+- WSL
 
 ## Repository structure
 
@@ -49,10 +57,14 @@ Build a reproducible batch pipeline focused on data engineering in order to prac
 - `src/utils/`: shared utilities such as logging
 - `scripts/`: execution scripts and manual validation helpers
 - `dbt_project/`: dbt project containing `staging` and `marts` models
+- `airflow/dags/`: Airflow DAG definition for phase 2 orchestration
+- `.github/workflows/`: CI workflow with GitHub Actions
 - `data/generated/`: locally generated CSV files
 - `docs/`: technical project documentation
 
 ## Pipeline flow
+
+### Phase 1 — Local runner
 
 1. generate `users`
 2. generate `subscriptions` from `users`
@@ -62,6 +74,15 @@ Build a reproducible batch pipeline focused on data engineering in order to prac
 6. build `staging` models with dbt in `saas_staging`
 7. build `marts` models with dbt in `saas_marts`
 8. run basic data quality tests with dbt
+
+### Phase 2 — Airflow orchestration
+
+The same flow can also be executed through an Airflow DAG that separates the pipeline into explicit tasks for:
+
+- synthetic table generation
+- raw loading by table
+- layered `dbt run` execution
+- `dbt test` execution
 
 ## Data model
 
@@ -112,9 +133,11 @@ The project includes basic dbt tests, including:
 
 These tests are applied to primary keys and model relationships across staging and marts.
 
+In addition, the repository includes a basic automated validation with GitHub Actions to verify core imports and run a lightweight synthetic generation smoke test on each `push` or `pull request`.
+
 ## Execution
 
-Example of end-to-end pipeline execution:
+### End-to-end execution with the local runner
 
     python -m scripts.run_pipeline
 
@@ -125,6 +148,34 @@ This command executes the full workflow:
 - raw loading into BigQuery
 - `dbt run`
 - `dbt test`
+
+### Orchestrated execution with Airflow
+
+In phase 2, the pipeline can also be executed from Airflow through a local DAG, with task-level visibility, explicit dependencies, and logs available in the Airflow UI.
+
+## Project phases
+
+### Phase 1 — Reproducible batch MVP
+
+The first phase of the project focused on building a local and reproducible batch pipeline with:
+
+- synthetic data generation in Python
+- raw loading into BigQuery
+- layered transformations with dbt
+- basic data quality tests
+- end-to-end execution with a single local runner
+
+### Phase 2 — Airflow orchestration
+
+Once the MVP was validated, a second phase was added to explore orchestration:
+
+- pipeline execution through an Airflow DAG
+- flow separation into tasks
+- explicit task dependencies
+- XCom used to pass small metadata between tasks
+- execution and observability through the Airflow UI
+
+This second phase was implemented as an extension of the existing pipeline rather than a rewrite of the core logic.
 
 ## Technical documentation
 
@@ -141,17 +192,19 @@ The pipeline design, data model structure, simplification decisions, result vali
 
 ## Current limitations
 
-- the pipeline is batch and local, not orchestrated
+- the pipeline remains batch and local
+- the Airflow orchestration is implemented in a local learning environment, not in a production deployment
 - the data is synthetic and does not represent a real production source
 - the current data quality tests are basic
+- the current CI only performs lightweight checks and does not execute the full pipeline with external services
 - incremental loads are not implemented
-- orchestration is not included in this first phase
 - no dashboards or visualization layer are included
 
 ## Future improvements
 
-- introduce orchestration with Apache Airflow or a lighter alternative
+- expand automated validation with additional structural or quality checks
+- evolve the local orchestration setup toward a more production-like configuration
 - add more advanced dbt tests
 - evaluate incremental models
 - incorporate seeds or macros where they provide real value
-- add more automation for deployment or validation
+- add scheduling, retries, and alerts as the next orchestration step
