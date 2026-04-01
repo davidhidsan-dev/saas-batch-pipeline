@@ -74,6 +74,10 @@ def load_csv_to_bigquery(
     Returns:
         str: Fully qualified BigQuery table id.
     """
+    
+    if not PROJECT_ID:
+        raise ValueError("PROJECT_ID is not set in the environment variables.")
+
     logger.info(f"Reading local CSV file path={csv_path}")
 
     df = pd.read_csv(csv_path)

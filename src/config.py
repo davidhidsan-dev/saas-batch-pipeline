@@ -15,9 +15,6 @@ RAW_DATASET = os.getenv("RAW_DATASET", "saas_raw")
 STAGING_DATASET = os.getenv("STAGING_DATASET", "saas_staging")
 MARTS_DATASET = os.getenv("MARTS_DATASET", "saas_marts")
 
-if not PROJECT_ID:
-    raise ValueError("PROJECT_ID is not set in the environment variables.")
-
 # File paths
 USERS_FILE = DATA_DIR / "users.csv"
 SUBSCRIPTIONS_FILE = DATA_DIR / "subscriptions.csv"
