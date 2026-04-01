@@ -1,3 +1,7 @@
+"""
+Run a local smoke test for synthetic data generation and basic consistency checks.
+"""
+
 import pandas as pd
 
 from src.config import (
@@ -16,6 +20,13 @@ from src.generate.users_generator import generate_users, save_users
 
 
 def main() -> None:
+    """
+    Generate all synthetic source tables, save them locally, and print
+    lightweight validation checks to the console.
+
+    This script is intended for local validation of the generation layer
+    before loading data into BigQuery or running downstream transformations.
+    """
     users_df = generate_users(USERS_COUNT)
     subscriptions_df = generate_subscriptions(users_df)
     events_df = generate_events(users_df, subscriptions_df, EVENTS_COUNT)

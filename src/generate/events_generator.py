@@ -1,15 +1,35 @@
+"""
+Generate synthetic SaaS events data for the batch pipeline.
+"""
+
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
 
+
 def generate_events(
     users_df: pd.DataFrame,
     subscriptions_df: pd.DataFrame,
     n_events: int,
 ) -> pd.DataFrame:
-    """Generate synthetic SaaS events."""
+    """
+    Generate a synthetic events dataset for the SaaS source model.
+
+    Events are generated from existing users and may optionally reference
+    a subscription for payment-related event types. The dataset includes
+    timestamps, event types, session identifiers, device types, and
+    optional numeric values for selected events.
+
+    Args:
+        users_df: Users dataframe used as the source for event generation.
+        subscriptions_df: Subscriptions dataframe used to map users to subscriptions.
+        n_events: Number of events to generate.
+
+    Returns:
+        DataFrame with synthetic events data.
+    """
     event_ids = []
     user_ids = []
     event_timestamps = []
@@ -37,7 +57,9 @@ def generate_events(
         .to_dict()
     )
 
-    users_records = list(users_df[["user_id", "created_at"]].itertuples(index=False, name=None))
+    users_records = list(
+        users_df[["user_id", "created_at"]].itertuples(index=False, name=None)
+    )
     now = datetime.now()
 
     for i in range(1, n_events + 1):
@@ -98,6 +120,12 @@ def generate_events(
 
 
 def save_events(df: pd.DataFrame, output_path: Path) -> None:
-    """Save events dataframe to CSV."""
+    """
+    Save the generated events dataset to a CSV file.
+
+    Args:
+        df: Events dataframe to save.
+        output_path: Destination path for the CSV file.
+    """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)

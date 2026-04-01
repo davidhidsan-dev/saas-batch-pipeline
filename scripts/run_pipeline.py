@@ -1,3 +1,10 @@
+"""
+Run the full SaaS batch pipeline end to end.
+
+This script generates synthetic source data, saves local CSV files,
+loads raw tables into BigQuery, and executes dbt models and tests.
+"""
+
 from pathlib import Path
 import subprocess
 import sys
@@ -24,7 +31,15 @@ DBT_PROJECT_DIR = Path(__file__).resolve().parent.parent / "dbt_project"
 
 
 def run_dbt_command(command: list[str]) -> None:
-    """Run a dbt command inside the dbt project directory."""
+    """
+    Run a dbt command inside the dbt project directory.
+
+    Args:
+        command: dbt command to execute as a list of strings.
+
+    Raises:
+        RuntimeError: If the dbt command exits with a non-zero status.
+    """
     logger.info(f"Running dbt command: {' '.join(command)}")
 
     result = subprocess.run(
@@ -39,7 +54,17 @@ def run_dbt_command(command: list[str]) -> None:
 
 
 def main() -> None:
-    """Run the full batch pipeline end to end."""
+    """
+    Execute the full batch pipeline from synthetic generation to dbt validation.
+
+    The workflow includes:
+    - users generation and local persistence
+    - subscriptions generation and local persistence
+    - events generation and local persistence
+    - raw loading into BigQuery
+    - dbt model execution
+    - dbt test execution
+    """
     logger.info("Starting full batch pipeline")
 
     logger.info("Generating users dataset")

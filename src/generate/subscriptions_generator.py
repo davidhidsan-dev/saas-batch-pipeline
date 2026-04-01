@@ -1,11 +1,28 @@
+"""
+Generate synthetic SaaS subscriptions data for the batch pipeline.
+"""
+
 import random
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 import pandas as pd
 
+
 def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
-    """Generate synthetic SaaS subscriptions from paid users."""
+    """
+    Generate a synthetic subscriptions dataset from paid users.
+
+    This function selects a subset of users with paid plans and creates
+    one subscription at most per selected user. Subscription attributes
+    include start and end dates, billing cycle, price, status, and plan tier.
+
+    Args:
+        users_df: Users dataframe used as the source for subscription generation.
+
+    Returns:
+        DataFrame with synthetic subscriptions data.
+    """
     max_days_start = 30
     min_days_end = 30
     max_days_end = 180
@@ -107,6 +124,12 @@ def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def save_subscriptions(df: pd.DataFrame, output_path: Path) -> None:
-    """Save subscriptions dataframe to CSV."""
+    """
+    Save the generated subscriptions dataset to a CSV file.
+
+    Args:
+        df: Subscriptions dataframe to save.
+        output_path: Destination path for the CSV file.
+    """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)

@@ -1,3 +1,12 @@
+"""
+Define the Airflow DAG used to orchestrate the SaaS batch pipeline.
+
+This DAG runs the same pipeline already implemented in Python and dbt,
+but separates it into explicit tasks for generation, raw loading, dbt
+execution, and testing. The DAG runs in Airflow on WSL while reusing
+the Windows-based project environment for Python and dbt execution.
+"""
+
 from __future__ import annotations
 
 import json
@@ -14,6 +23,19 @@ DBT_PROJECT_DIR = PROJECT_ROOT / "dbt_project"
 
 
 def run_subprocess(command: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess:
+    """
+    Execute a subprocess command and raise an error if it fails.
+
+    Args:
+        command: Command to execute as a list of strings.
+        cwd: Optional working directory for the command.
+
+    Returns:
+        CompletedProcess with command execution details.
+
+    Raises:
+        RuntimeError: If the subprocess exits with a non-zero status.
+    """
     result = subprocess.run(
         command,
         cwd=str(cwd) if cwd else None,
@@ -35,8 +57,27 @@ def run_subprocess(command: list[str], cwd: Path | None = None) -> subprocess.Co
     tags=["saas", "batch", "bigquery", "dbt", "airflow"],
 )
 def saas_batch_pipeline():
+    """
+    Orchestrate the SaaS batch pipeline with Airflow.
+
+    The DAG separates the flow into task-level steps for:
+    - users generation
+    - subscriptions generation
+    - events generation
+    - raw loading into BigQuery
+    - dbt staging execution
+    - dbt marts execution
+    - dbt testing
+    """
+
     @task
     def generate_users() -> dict:
+        """
+        Generate the users dataset and save it locally.
+
+        Returns:
+            Dictionary with the generated CSV path and row count.
+        """
         code = """
 import json
 from src.config import USERS_COUNT, USERS_FILE
@@ -58,6 +99,15 @@ print(json.dumps({
 
     @task
     def generate_subscriptions(users_output: dict) -> dict:
+        """
+        Generate the subscriptions dataset from the users dataset.
+
+        Args:
+            users_output: Metadata returned by the users generation task.
+
+        Returns:
+            Dictionary with the generated CSV path and row count.
+        """
         code = f"""
 import json
 import pandas as pd
@@ -84,6 +134,16 @@ print(json.dumps({{
 
     @task
     def generate_events(users_output: dict, subscriptions_output: dict) -> dict:
+        """
+        Generate the events dataset from users and subscriptions.
+
+        Args:
+            users_output: Metadata returned by the users generation task.
+            subscriptions_output: Metadata returned by the subscriptions generation task.
+
+        Returns:
+            Dictionary with the generated CSV path and row count.
+        """
         code = f"""
 import json
 import pandas as pd
@@ -113,6 +173,15 @@ print(json.dumps({{
 
     @task
     def load_raw_users(users_output: dict) -> dict:
+        """
+        Load the users CSV file into the raw BigQuery layer.
+
+        Args:
+            users_output: Metadata returned by the users generation task.
+
+        Returns:
+            Dictionary with the loaded BigQuery table id.
+        """
         code = f"""
 import json
 from pathlib import Path
@@ -136,6 +205,15 @@ print(json.dumps({{
 
     @task
     def load_raw_subscriptions(subscriptions_output: dict) -> dict:
+        """
+        Load the subscriptions CSV file into the raw BigQuery layer.
+
+        Args:
+            subscriptions_output: Metadata returned by the subscriptions generation task.
+
+        Returns:
+            Dictionary with the loaded BigQuery table id.
+        """
         code = f"""
 import json
 from pathlib import Path
@@ -159,6 +237,15 @@ print(json.dumps({{
 
     @task
     def load_raw_events(events_output: dict) -> dict:
+        """
+        Load the events CSV file into the raw BigQuery layer.
+
+        Args:
+            events_output: Metadata returned by the events generation task.
+
+        Returns:
+            Dictionary with the loaded BigQuery table id.
+        """
         code = f"""
 import json
 from pathlib import Path
@@ -182,6 +269,9 @@ print(json.dumps({{
 
     @task
     def dbt_run_staging() -> None:
+        """
+        Run dbt staging models.
+        """
         run_subprocess(
             [str(WINDOWS_DBT), "run", "--select", "staging"],
             cwd=DBT_PROJECT_DIR,
@@ -189,6 +279,9 @@ print(json.dumps({{
 
     @task
     def dbt_run_marts() -> None:
+        """
+        Run dbt marts models.
+        """
         run_subprocess(
             [str(WINDOWS_DBT), "run", "--select", "marts"],
             cwd=DBT_PROJECT_DIR,
@@ -196,6 +289,9 @@ print(json.dumps({{
 
     @task
     def dbt_test() -> None:
+        """
+        Run dbt tests after model execution.
+        """
         run_subprocess(
             [str(WINDOWS_DBT), "test"],
             cwd=DBT_PROJECT_DIR,

@@ -1,3 +1,7 @@
+"""
+Generate synthetic SaaS users data for the batch pipeline.
+"""
+
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -16,7 +20,18 @@ from src.config import (
 
 
 def generate_users(n_users: int) -> pd.DataFrame:
-    """Generate synthetic SaaS users."""
+    """
+    Generate a synthetic users dataset for the SaaS source model.
+
+    The generated data includes basic user attributes such as signup timestamp,
+    country, acquisition channel, plan type, activity status, and email domain.
+
+    Args:
+        n_users: Number of users to generate.
+
+    Returns:
+        DataFrame with synthetic users data.
+    """
     now = datetime.now()
     max_seconds_back = 365 * 24 * 60 * 60
 
@@ -70,6 +85,12 @@ def generate_users(n_users: int) -> pd.DataFrame:
 
 
 def save_users(df: pd.DataFrame, output_path: Path) -> None:
-    """Save users dataframe to CSV."""
+    """
+    Save the generated users dataset to a CSV file.
+
+    Args:
+        df: Users dataframe to save.
+        output_path: Destination path for the CSV file.
+    """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)

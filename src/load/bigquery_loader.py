@@ -1,3 +1,7 @@
+"""
+Load synthetic SaaS source tables from local CSV files into BigQuery raw tables.
+"""
+
 from pathlib import Path
 
 import pandas as pd
@@ -50,7 +54,11 @@ EVENTS_SCHEMA = [
 
 def ensure_dataset_exists(client: bigquery.Client, dataset_name: str) -> None:
     """
-    Create the dataset if it does not exist.
+    Create a BigQuery dataset if it does not already exist.
+
+    Args:
+        client: Initialized BigQuery client.
+        dataset_name: Name of the dataset to check or create.
     """
     dataset_id = f"{PROJECT_ID}.{dataset_name}"
 
@@ -71,10 +79,17 @@ def load_csv_to_bigquery(
     """
     Load a local CSV file into a BigQuery raw table.
 
+    Args:
+        csv_path: Path to the source CSV file.
+        table_name: Target BigQuery table name.
+        schema: Explicit BigQuery schema for the target table.
+
     Returns:
-        str: Fully qualified BigQuery table id.
+        Fully qualified BigQuery table id.
+
+    Raises:
+        ValueError: If PROJECT_ID is not configured in the environment.
     """
-    
     if not PROJECT_ID:
         raise ValueError("PROJECT_ID is not set in the environment variables.")
 
@@ -114,7 +129,9 @@ def load_csv_to_bigquery(
 
 def load_raw_tables_to_bigquery() -> None:
     """
-    Load all raw source tables into BigQuery.
+    Load all generated raw source tables into BigQuery.
+
+    This includes the users, subscriptions, and events source tables.
     """
     users_table_id = load_csv_to_bigquery(
         csv_path=USERS_FILE,
@@ -149,7 +166,7 @@ def load_raw_tables_to_bigquery() -> None:
 
 def main() -> None:
     """
-    Load all raw source tables into BigQuery.
+    Load all generated raw source tables into BigQuery.
     """
     load_raw_tables_to_bigquery()
 
