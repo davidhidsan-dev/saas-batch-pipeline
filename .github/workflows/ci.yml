@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -26,10 +26,10 @@ jobs:
 
       - name: Verify project imports
         run: |
-          python -c "from src.generate.users_generator import generate_users"
-          python -c "from src.generate.subscriptions_generator import generate_subscriptions"
-          python -c "from src.generate.events_generator import generate_events"
+          python -c "from src.generate.users_generator import generate_users; print('users import ok')"
+          python -c "from src.generate.subscriptions_generator import generate_subscriptions; print('subscriptions import ok')"
+          python -c "from src.generate.events_generator import generate_events; print('events import ok')"
 
       - name: Run synthetic generation smoke test
         run: |
-          python -c "from src.generate.users_generator import generate_users; df = generate_users(10); print(len(df))"
+          python -c "from src.generate.users_generator import generate_users; df = generate_users(10); assert len(df) == 10; print(df[['user_id', 'created_at']].head())"
