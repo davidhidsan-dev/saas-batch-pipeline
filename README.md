@@ -2,6 +2,8 @@
 
 English version of this README: [README_EN.md](README_EN.md)
 
+> Proyecto controlado de aprendizaje enfocado en fundamentos de ELT con BigQuery, dbt, Airflow y GitHub Actions usando datos SaaS sintéticos.
+
 ## Descripción
 
 Proyecto end-to-end de data engineering para generar, cargar, transformar, validar y orquestar datos sintéticos de un producto SaaS usando Python, BigQuery, dbt y Apache Airflow.
@@ -9,6 +11,18 @@ Proyecto end-to-end de data engineering para generar, cargar, transformar, valid
 El pipeline construye una fuente sintética coherente con tres tablas (`users`, `subscriptions`, `events`), carga esos datos en BigQuery en la capa raw, aplica transformaciones por capas con dbt, ejecuta tests básicos de calidad y puede orquestarse mediante Airflow como extensión del MVP inicial.
 
 El resultado final es un pipeline batch reproducible, ejecutable de extremo a extremo con un único script local y, en una segunda fase, también mediante un DAG de Airflow.
+
+## Estado del proyecto
+
+Versión funcional completada como entorno controlado de aprendizaje:
+
+- generación sintética de datos SaaS
+- carga raw en BigQuery
+- modelos staging y marts con dbt
+- tests básicos de calidad con dbt
+- ejecución local end-to-end
+- orquestación local con Airflow
+- validación ligera con GitHub Actions
 
 ## Objetivo del proyecto
 
