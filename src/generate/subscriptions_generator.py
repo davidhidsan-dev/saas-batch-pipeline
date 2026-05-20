@@ -13,8 +13,8 @@ def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
     """
     Generate a synthetic subscriptions dataset from paid users.
 
-    This function selects a subset of users with paid plans and creates
-    one subscription at most per selected user. Subscription attributes
+    This function selects users with paid plans and creates one subscription
+    per paid user. Subscription attributes
     include start and end dates, billing cycle, price, status, and plan tier.
 
     Args:
@@ -44,9 +44,6 @@ def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
             ]
         )
 
-    n_subscriptions = max(1, int(len(paid_users_df) * 0.85))
-    selected_users_df = paid_users_df.sample(n=n_subscriptions, random_state=42)
-
     subscription_ids = []
     user_ids = []
     start_dates = []
@@ -58,7 +55,7 @@ def generate_subscriptions(users_df: pd.DataFrame) -> pd.DataFrame:
 
     subscription_counter = 1
 
-    for user in selected_users_df.itertuples(index=False):
+    for user in paid_users_df.itertuples(index=False):
         subscription_ids.append(f"sub_{subscription_counter:04d}")
         user_ids.append(user.user_id)
 

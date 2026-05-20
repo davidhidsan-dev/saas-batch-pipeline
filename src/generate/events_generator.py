@@ -61,6 +61,7 @@ def generate_events(
         users_df[["user_id", "created_at"]].itertuples(index=False, name=None)
     )
     now = datetime.now()
+    max_session_id = max(1, n_events // 2)
 
     for i in range(1, n_events + 1):
         user_id, created_at = random.choice(users_records)
@@ -72,11 +73,18 @@ def generate_events(
         random_seconds_after_signup = random.randint(0, max_seconds_after_signup)
         event_timestamp = created_at + timedelta(seconds=random_seconds_after_signup)
 
-        event_type = random.choices(
-            event_type_options,
-            weights=event_type_weights,
-            k=1,
-        )[0]
+        if user_id in user_subscription_map:
+            event_type = random.choices(
+                event_type_options,
+                weights=event_type_weights,
+                k=1,
+            )[0]
+        else:
+            event_type = random.choices(
+                event_type_options[:3],
+                weights=event_type_weights[:3],
+                k=1,
+            )[0]
 
         device_type = random.choices(
             device_type_options,
@@ -84,7 +92,7 @@ def generate_events(
             k=1,
         )[0]
 
-        session_id = f"session_{random.randint(1, n_events // 2):05d}"
+        session_id = f"session_{random.randint(1, max_session_id):05d}"
 
         subscription_id = None
         if event_type in ["upgrade_click", "cancel_click"]:
